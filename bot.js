@@ -12,9 +12,9 @@ const supabase = createClient(
 
 const ADMIN_CHAT_ID = '562890944';
 const PHONE = '8 (920) 048-22-72';
-const PHONE_TEL = 'tel:+79200482272';
 const WEBSITE = 'https://padel1020.ru';
 const CHAT_LINK = 'https://t.me/+CRrPn7qJB3phNDUy';
+const BOOKING_LINK = 'https://n1488777.yclients.com/';
 
 // Функция логирования в Supabase
 async function logToSupabase(source, userName, username, chatId, action, message = null) {
@@ -43,10 +43,10 @@ async function logToSupabase(source, userName, username, chatId, action, message
 // Главное меню
 const mainMenu = {
   inline_keyboard: [
-    [{ text: '📅 Забронировать корт', url: 'https://n1488777.yclients.com/' }],
-    [{ text: 'ℹ️ Что такое падел?', callback_data: 'about' }],
-    [{ text: '🎾 Пробное занятие', callback_data: 'trial_general' }],
-    [{ text: '📞 Связаться', callback_data: 'contacts' }]
+    [{ text: '🎾 Пробное занятие', callback_data: 'trial_start' }],
+    [{ text: '💳 Абонементы', callback_data: 'subscriptions' }],
+    [{ text: 'ℹ️ Что такое падел?', callback_data: 'about_start' }],
+    [{ text: '📞 Контакты', callback_data: 'contacts' }]
   ]
 };
 
@@ -64,22 +64,25 @@ bot.onText(/\/start(.*)/, async (msg, match) => {
   // ОБЩАЯ ЛИСТОВКА
   if (startParam === 'flyer_general') {
     source = 'flyer_general';
-    welcomeMessage = `Здравствуйте, ${userName}! 👋
+    welcomeMessage = `Привет, ${userName}! 👋
 
-Вы узнали о нас из листовки? Отлично! 
+Отлично, что заглянули по листовке! 
 
-🎾 Падел — это микс тенниса и сквоша
-Играют парами, правила простые
-Даже если никогда не держали ракетку — всё получится!
+Падел — это спорт который захватил Европу и Латинскую Америку. Сейчас он приходит в Россию, и вы можете стать одними из первых!
 
-Что вас интересует?`;
+🎾 Почему падел — это круто:
+- Легко начать (научитесь за 1 занятие)
+- Активная нагрузка без перегрузок
+- Играют парами — социально и весело
+- Любая погода (крытые корты)
+
+Хотите попробовать?`;
     
     keyboard = {
       inline_keyboard: [
-        [{ text: '🎾 Пробное занятие (1500₽)', callback_data: 'trial_general' }],
-        [{ text: '👥 Вечерние игры', callback_data: 'evening' }],
-        [{ text: 'ℹ️ Что такое падел?', callback_data: 'about' }],
-        [{ text: '📞 Связаться', callback_data: 'contacts' }]
+        [{ text: '🎾 Да, хочу попробовать!', callback_data: 'trial_start' }],
+        [{ text: '💳 Сразу смотрю абонементы', callback_data: 'subscriptions' }],
+        [{ text: 'ℹ️ Расскажите подробнее', callback_data: 'about_start' }]
       ]
     };
     
@@ -89,23 +92,26 @@ bot.onText(/\/start(.*)/, async (msg, match) => {
   // СЕМЕЙНАЯ ЛИСТОВКА
   else if (startParam === 'flyer_family') {
     source = 'flyer_family';
-    welcomeMessage = `Здравствуйте, ${userName}! 👋
+    welcomeMessage = `Привет, ${userName}! 👋
 
-Рады, что заинтересовались семейным паделом! 👨‍👩‍👧
+Здорово, что интересуетесь семейным спортом! 👨‍👩‍👧
 
-🎾 Падел безопасен для детей от 6 лет:
-- Мягкий мяч
-- Закрытый корт
-- Тренер всё покажет
+Падел — идеальный вариант для всей семьи:
+✅ Дети от 6 лет легко осваивают
+✅ Безопасно (мягкий мяч, закрытый корт)
+✅ Родители и дети играют ВМЕСТЕ
+✅ Развивает координацию и реакцию
+✅ Альтернатива гаджетам
 
-Можем предложить:`;
+Многие наши клиенты говорят: "Наконец-то нашли активность, которая нравится ВСЕЙ семье!"
+
+Что вас интересует?`;
     
     keyboard = {
       inline_keyboard: [
         [{ text: '👨‍👩‍👧 Семейное занятие', callback_data: 'trial_family' }],
-        [{ text: '🧍 Сначала попробую сам(а)', callback_data: 'trial_adult' }],
-        [{ text: 'ℹ️ Что такое падел?', callback_data: 'about' }],
-        [{ text: '📞 Связаться', callback_data: 'contacts' }]
+        [{ text: '💳 Семейные абонементы', callback_data: 'family_subscriptions' }],
+        [{ text: '🧍 Сначала попробую сам', callback_data: 'trial_start' }]
       ]
     };
     
@@ -117,12 +123,13 @@ bot.onText(/\/start(.*)/, async (msg, match) => {
     source = 'direct';
     welcomeMessage = `Привет, ${userName}! 👋
 
-Я бот клуба Падел 10/20 🎾
+Добро пожаловать в Падел 10/20 🎾
 
-📍 Московское шоссе, 105к10
-⏰ Работаем ежедневно 8:00-23:00
+Мы — первый премиальный падел-клуб в Нижнем Новгороде.
 
-Чем могу помочь?`;
+Падел — это новый вид спорта, который взорвал Европу. Представьте теннис + сквош = адреналин, азарт и классная компания!
+
+Что хотите узнать?`;
     
     keyboard = mainMenu;
   }
@@ -147,10 +154,10 @@ bot.on('callback_query', async (query) => {
   await logToSupabase('callback', userName, username, chatId, data, null);
   
   try {
-    // Главное меню
+    // ========== ГЛАВНОЕ МЕНЮ ==========
     if (data === 'main_menu') {
       await bot.editMessageText(
-        `Привет, ${userName}! 👋\n\nЯ бот клуба Падел 10/20 🎾\n\n📍 Московское шоссе, 105к10\n⏰ Работаем ежедневно 8:00-23:00\n\nЧем могу помочь?`,
+        `Привет, ${userName}! 👋\n\nЯ бот клуба Падел 10/20 🎾\n\n📍 Московское шоссе, 105к10\n⏰ Работаем ежедневно 8:00-23:00\n\nЧто хотите узнать?`,
         {
           chat_id: chatId,
           message_id: messageId,
@@ -159,23 +166,25 @@ bot.on('callback_query', async (query) => {
       );
     }
     
-    // Контакты
+    // ========== КОНТАКТЫ ==========
     else if (data === 'contacts') {
       await bot.editMessageText(
         `📞 Контакты Падел 10/20\n\n` +
         `☎️ Телефон: ${PHONE}\n` +
         `🌐 Сайт: ${WEBSITE}\n` +
-        `💬 Чат клуба: присоединяйтесь!\n\n` +
+        `💬 Чат клуба (найдите партнёров для игры)\n\n` +
         `📍 Адрес: Московское шоссе, 105к10\n` +
-        `⏰ Ежедневно 8:00-23:00`,
+        `🚗 Бесплатная парковка\n` +
+        `⏰ Ежедневно 8:00-23:00\n\n` +
+        `Звоните или пишите — ответим на все вопросы!`,
         {
           chat_id: chatId,
           message_id: messageId,
           reply_markup: {
             inline_keyboard: [
-              [{ text: '📱 Позвонить', url: PHONE_TEL }],
               [{ text: '🌐 Открыть сайт', url: WEBSITE }],
               [{ text: '💬 Чат клуба', url: CHAT_LINK }],
+              [{ text: '📅 Забронировать корт', url: BOOKING_LINK }],
               [{ text: '🏠 Главное меню', callback_data: 'main_menu' }]
             ]
           }
@@ -185,120 +194,376 @@ bot.on('callback_query', async (query) => {
       await bot.sendMessage(ADMIN_CHAT_ID, `📞 Пользователь ${userName} (@${username}) открыл контакты`);
     }
     
-    // Пробное занятие (общее)
-    else if (data === 'trial_general') {
+    // ========== ЧТО ТАКОЕ ПАДЕЛ (воронка) ==========
+    else if (data === 'about_start') {
       await bot.editMessageText(
-        `Отлично! Пробное занятие с тренером 🎾\n\n` +
-        `📅 Доступные дни (будни):\n` +
-        `Понедельник-пятница: 10:00-17:00\n` +
-        `Стоимость: 1500₽ с человека\n\n` +
-        `📝 Для записи напишите:\n` +
+        `Что такое падел? 🎾\n\n` +
+        `Падел — это микс тенниса и сквоша.\n\n` +
+        `Играют парами на корте, окружённом стенами. Мяч отскакивает от стен — это добавляет драйва и тактики!\n\n` +
+        `Родился в Мексике в 1960-х, взорвал Испанию в 90-х, сейчас №1 спорт в Аргентине.\n\n` +
+        `В Европе 20+ миллионов игроков. В России только начинается — будьте в числе первых!`,
+        {
+          chat_id: chatId,
+          message_id: messageId,
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: '👍 Понятно, а что мне даст?', callback_data: 'about_benefits' }],
+              [{ text: '🎾 Хочу попробовать!', callback_data: 'trial_start' }],
+              [{ text: '🏠 Главное меню', callback_data: 'main_menu' }]
+            ]
+          }
+        }
+      );
+    }
+    
+    else if (data === 'about_benefits') {
+      await bot.editMessageText(
+        `Почему падел — это ВАШ спорт? 💪\n\n` +
+        `1️⃣ Быстрый старт\n` +
+        `Научитесь играть за ОДНО занятие. Не нужно месяцами отрабатывать технику как в теннисе.\n\n` +
+        `2️⃣ Нагрузка + безопасность\n` +
+        `Сжигаете 600-800 ккал за час, но нет ударных нагрузок на колени.\n\n` +
+        `3️⃣ Социальность\n` +
+        `Играют парами — легко найти компанию. У нас чат клуба, где ищут партнёров!\n\n` +
+        `4️⃣ Всесезонность\n` +
+        `Крытые корты — играете круглый год.\n\n` +
+        `5️⃣ Азарт\n` +
+        `Быстрые розыгрыши, тактика, адреналин — не заметите как пролетит час!`,
+        {
+          chat_id: chatId,
+          message_id: messageId,
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: '🔥 Убедили! Записываюсь', callback_data: 'trial_start' }],
+              [{ text: '🤔 А это сложно?', callback_data: 'about_difficulty' }],
+              [{ text: '🏠 Главное меню', callback_data: 'main_menu' }]
+            ]
+          }
+        }
+      );
+    }
+    
+    else if (data === 'about_difficulty') {
+      await bot.editMessageText(
+        `Это легко? Конечно! 😊\n\n` +
+        `Падел создан так, чтобы в него могли играть ВСЕ:\n\n` +
+        `👶 Дети от 6 лет\n` +
+        `Наши юные игроки осваивают за 2-3 занятия.\n\n` +
+        `👨 Новички 25-45 лет\n` +
+        `Большинство играют в своё удовольствие уже с первой игры.\n\n` +
+        `👵 Возраст 50+\n` +
+        `Много клиентов 50-60 лет. Нагрузку регулируете сами.\n\n` +
+        `💡 Секрет: парная игра и стены делают падел доступным для любого уровня!`,
+        {
+          chat_id: chatId,
+          message_id: messageId,
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: '🎾 Записаться на пробное', callback_data: 'trial_start' }],
+              [{ text: '💳 Смотреть абонементы', callback_data: 'subscriptions' }],
+              [{ text: '🏠 Главное меню', callback_data: 'main_menu' }]
+            ]
+          }
+        }
+      );
+    }
+    
+    // ========== ПРОБНОЕ ЗАНЯТИЕ (воронка) ==========
+    else if (data === 'trial_start') {
+      await bot.editMessageText(
+        `Пробное занятие с тренером 🎾\n\n` +
+        `Что входит:\n` +
+        `✅ 1 час игры с профессиональным тренером\n` +
+        `✅ Обучение базовым техникам\n` +
+        `✅ Ракетки и мячи предоставляем\n` +
+        `✅ Душ и раздевалка\n\n` +
+        `📅 Когда удобно:\n` +
+        `Будни 10:00-17:00 — 1500₽/чел\n` +
+        `Вечера и выходные — 2000₽/чел\n\n` +
+        `💰 Почему стоит попробовать сейчас?\n` +
+        `После пробного — скидка 20% на первый абонемент!`,
+        {
+          chat_id: chatId,
+          message_id: messageId,
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: '📝 Записаться на пробное', callback_data: 'trial_book' }],
+              [{ text: '🤔 Что нужно иметь с собой?', callback_data: 'trial_what_bring' }],
+              [{ text: '💳 Сразу смотрю абонементы', callback_data: 'subscriptions' }],
+              [{ text: '🏠 Главное меню', callback_data: 'main_menu' }]
+            ]
+          }
+        }
+      );
+    }
+    
+    else if (data === 'trial_what_bring') {
+      await bot.editMessageText(
+        `Что взять на занятие? 👟\n\n` +
+        `Нужно:\n` +
+        `✅ Спортивная одежда\n` +
+        `✅ Кроссовки с нескользящей подошвой\n` +
+        `✅ Вода (есть кулер в клубе)\n\n` +
+        `НЕ нужно:\n` +
+        `❌ Ракетки (выдаём бесплатно)\n` +
+        `❌ Мячи (предоставляем)\n` +
+        `❌ Полотенце (есть в раздевалке)\n\n` +
+        `💡 Совет: приходите за 10 минут до занятия, чтобы переодеться и освоиться.`,
+        {
+          chat_id: chatId,
+          message_id: messageId,
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: '📝 Отлично, записываюсь!', callback_data: 'trial_book' }],
+              [{ text: '🏠 Главное меню', callback_data: 'main_menu' }]
+            ]
+          }
+        }
+      );
+    }
+    
+    else if (data === 'trial_book') {
+      await bot.editMessageText(
+        `Запись на пробное занятие 📝\n\n` +
+        `Напишите сообщением:\n` +
         `1️⃣ Ваше имя\n` +
         `2️⃣ Телефон\n` +
         `3️⃣ Удобный день и время\n` +
         `4️⃣ Сколько человек?\n\n` +
+        `Пример:\n` +
+        `"Владимир\n${PHONE}\nЗавтра в 18:00\n2 человека"\n\n` +
         `Или позвоните: ${PHONE}`,
         {
           chat_id: chatId,
           message_id: messageId,
           reply_markup: {
             inline_keyboard: [
-              [{ text: '📱 Позвонить', url: PHONE_TEL }],
+              [{ text: '📅 Онлайн-бронирование', url: BOOKING_LINK }],
               [{ text: '🏠 Главное меню', callback_data: 'main_menu' }]
             ]
           }
         }
       );
+      
+      await bot.sendMessage(ADMIN_CHAT_ID, `🎾 ${userName} (@${username}) хочет записаться на пробное!`);
     }
     
-    // Семейное занятие
+    // ========== СЕМЕЙНОЕ ПРОБНОЕ ==========
     else if (data === 'trial_family') {
       await bot.editMessageText(
-        `Замечательно! Семейное занятие 👨‍👩‍👧\n\n` +
-        `📋 Для записи напишите:\n` +
+        `Семейное занятие 👨‍👩‍👧\n\n` +
+        `Что входит:\n` +
+        `✅ 1 час игры с тренером для всей семьи\n` +
+        `✅ Обучение детей и взрослых\n` +
+        `✅ Ракетки для детей и взрослых\n` +
+        `✅ Весёлая атмосфера\n\n` +
+        `💰 Цена:\n` +
+        `2 взрослых + 1 ребёнок = 3500₽\n` +
+        `2 взрослых + 2 детей = 4500₽\n\n` +
+        `🎁 Бонус: после занятия — семейная фотосессия на корте!`,
+        {
+          chat_id: chatId,
+          message_id: messageId,
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: '📝 Записаться', callback_data: 'trial_book' }],
+              [{ text: '💳 Семейные абонементы', callback_data: 'family_subscriptions' }],
+              [{ text: '🏠 Главное меню', callback_data: 'main_menu' }]
+            ]
+          }
+        }
+      );
+    }
+    
+    // ========== АБОНЕМЕНТЫ (воронка продаж) ==========
+    else if (data === 'subscriptions') {
+      await bot.editMessageText(
+        `Абонементы Падел 10/20 💳\n\n` +
+        `Зачем абонемент?\n` +
+        `✅ Экономия до 40% от разовой аренды\n` +
+        `✅ Приоритетное бронирование\n` +
+        `✅ Доступ в чат клуба\n` +
+        `✅ Участие в турнирах\n\n` +
+        `Выберите что подходит:`,
+        {
+          chat_id: chatId,
+          message_id: messageId,
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: '🎾 Индивидуальные', callback_data: 'sub_individual' }],
+              [{ text: '👥 Парные', callback_data: 'sub_pair' }],
+              [{ text: '👨‍👩‍👧 Семейные', callback_data: 'family_subscriptions' }],
+              [{ text: '🏠 Главное меню', callback_data: 'main_menu' }]
+            ]
+          }
+        }
+      );
+    }
+    
+    else if (data === 'sub_individual') {
+      await bot.editMessageText(
+        `Индивидуальные абонементы 🎾\n\n` +
+        `💎 СТАРТОВЫЙ (4 часа)\n` +
+        `6000₽ = 1500₽/час\n` +
+        `Срок: 30 дней\n` +
+        `Для: знакомство с паделом\n\n` +
+        `🔥 АКТИВНЫЙ (8 часов)\n` +
+        `10400₽ = 1300₽/час (экономия 1600₽!)\n` +
+        `Срок: 30 дней\n` +
+        `Для: регулярные игры 2 раза в неделю\n\n` +
+        `⭐ ПРЕМИУМ (12 часов)\n` +
+        `14400₽ = 1200₽/час (экономия 3600₽!)\n` +
+        `Срок: 45 дней\n` +
+        `Для: фанатов падела\n` +
+        `Бонус: 1 час персональной тренировки БЕСПЛАТНО!\n\n` +
+        `🎁 Первый абонемент со скидкой 15%!`,
+        {
+          chat_id: chatId,
+          message_id: messageId,
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: '💳 Купить абонемент', callback_data: 'sub_buy' }],
+              [{ text: '🤔 Чем отличаются?', callback_data: 'sub_compare' }],
+              [{ text: '🏠 Главное меню', callback_data: 'main_menu' }]
+            ]
+          }
+        }
+      );
+    }
+    
+    else if (data === 'sub_pair') {
+      await bot.editMessageText(
+        `Парные абонементы 👥\n\n` +
+        `Играете с постоянным партнёром? Берите парный абонемент!\n\n` +
+        `🔥 ДУО-СТАРТОВЫЙ (8 часов на двоих)\n` +
+        `10000₽ = 1250₽/час на двоих (625₽/чел)\n` +
+        `Экономия: 2000₽\n\n` +
+        `⭐ ДУО-АКТИВНЫЙ (16 часов на двоих)\n` +
+        `18000₽ = 1125₽/час на двоих (562₽/чел)\n` +
+        `Экономия: 5000₽\n\n` +
+        `💡 Почему парный:\n` +
+        `• Дешевле чем два индивидуальных\n` +
+        `• Всегда есть с кем играть\n` +
+        `• Развиваете командную тактику\n\n` +
+        `🎁 Скидка 20% на первый абонемент!`,
+        {
+          chat_id: chatId,
+          message_id: messageId,
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: '💳 Купить парный', callback_data: 'sub_buy' }],
+              [{ text: '🎾 Индивидуальные', callback_data: 'sub_individual' }],
+              [{ text: '🏠 Главное меню', callback_data: 'main_menu' }]
+            ]
+          }
+        }
+      );
+    }
+    
+    else if (data === 'family_subscriptions') {
+      await bot.editMessageText(
+        `Семейные абонементы 👨‍👩‍👧\n\n` +
+        `🌟 СЕМЬЯ-СТАРТ (8 часов)\n` +
+        `12000₽\n` +
+        `Для: 2 взрослых + 2 детей\n` +
+        `= 1500₽/час для всей семьи!\n\n` +
+        `⭐ СЕМЬЯ-АКТИВ (16 часов)\n` +
+        `20000₽ (экономия 4000₽!)\n` +
+        `Для: 2 взрослых + 2 детей\n` +
+        `Срок: 60 дней\n\n` +
+        `🎁 В подарок:\n` +
+        `• Детские ракетки на время абонемента\n` +
+        `• Сертификат на семейную фотосессию\n` +
+        `• Скидка 50% на день рождения ребёнка в клубе\n\n` +
+        `💡 Это 400-500₽/час/чел — дешевле чем кино!`,
+        {
+          chat_id: chatId,
+          message_id: messageId,
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: '💳 Купить семейный', callback_data: 'sub_buy' }],
+              [{ text: '🎾 Другие абонементы', callback_data: 'subscriptions' }],
+              [{ text: '🏠 Главное меню', callback_data: 'main_menu' }]
+            ]
+          }
+        }
+      );
+    }
+    
+    else if (data === 'sub_compare') {
+      await bot.editMessageText(
+        `Какой абонемент выбрать? 🤔\n\n` +
+        `СТАРТОВЫЙ (4 часа) — если:\n` +
+        `• Вы новичок\n` +
+        `• Хотите попробовать регулярно\n` +
+        `• Играете 1 раз в неделю\n\n` +
+        `АКТИВНЫЙ (8 часов) — если:\n` +
+        `• Уже поиграли и понравилось\n` +
+        `• Хотите играть 2 раза в неделю\n` +
+        `• Нужна максимальная экономия\n\n` +
+        `ПРЕМИУМ (12 часов) — если:\n` +
+        `• Падел стал вашим хобби\n` +
+        `• Играете 3+ раз в неделю\n` +
+        `• Хотите персональные тренировки\n\n` +
+        `💡 Совет: 80% клиентов берут АКТИВНЫЙ — оптимальный баланс цены и частоты игр!`,
+        {
+          chat_id: chatId,
+          message_id: messageId,
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: '💳 Выбрать абонемент', callback_data: 'sub_individual' }],
+              [{ text: '🏠 Главное меню', callback_data: 'main_menu' }]
+            ]
+          }
+        }
+      );
+    }
+    
+    else if (data === 'sub_buy') {
+      await bot.editMessageText(
+        `Покупка абонемента 💳\n\n` +
+        `Способы покупки:\n\n` +
+        `1️⃣ Онлайн (рекомендуем):\n` +
+        `Забронируйте через сайт — оплата картой, абонемент активируется сразу.\n\n` +
+        `2️⃣ В клубе:\n` +
+        `Приезжайте по адресу:\n` +
+        `Московское шоссе, 105к10\n` +
+        `Оплата наличными или картой.\n\n` +
+        `3️⃣ По телефону:\n` +
+        `Позвоните ${PHONE}\n` +
+        `Забронируем абонемент, отправим реквизиты.\n\n` +
+        `🎁 Акция: Первый абонемент со скидкой 15%!\n` +
+        `Просто напишите промокод: ПЕРВЫЙ`,
+        {
+          chat_id: chatId,
+          message_id: messageId,
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: '🌐 Купить на сайте', url: WEBSITE }],
+              [{ text: '💬 Написать менеджеру', callback_data: 'write_manager' }],
+              [{ text: '🏠 Главное меню', callback_data: 'main_menu' }]
+            ]
+          }
+        }
+      );
+      
+      await bot.sendMessage(ADMIN_CHAT_ID, `💳 ${userName} (@${username}) хочет купить абонемент!`);
+    }
+    
+    else if (data === 'write_manager') {
+      await bot.editMessageText(
+        `Связь с менеджером 💬\n\n` +
+        `Напишите сообщением:\n` +
         `1️⃣ Ваше имя\n` +
         `2️⃣ Телефон\n` +
-        `3️⃣ Сколько взрослых и детей?\n` +
-        `4️⃣ Возраст детей\n` +
-        `5️⃣ Удобный день и время\n\n` +
+        `3️⃣ Какой абонемент интересует\n\n` +
+        `Менеджер свяжется с вами в течение 15 минут!\n\n` +
         `Или позвоните: ${PHONE}`,
         {
           chat_id: chatId,
           message_id: messageId,
           reply_markup: {
             inline_keyboard: [
-              [{ text: '📱 Позвонить', url: PHONE_TEL }],
-              [{ text: '🏠 Главное меню', callback_data: 'main_menu' }]
-            ]
-          }
-        }
-      );
-    }
-    
-    // Взрослый сначала
-    else if (data === 'trial_adult') {
-      await bot.editMessageText(
-        `Хорошая идея! Сначала попробуете сами 🎾\n\n` +
-        `📝 Для записи напишите:\n` +
-        `1️⃣ Ваше имя\n` +
-        `2️⃣ Телефон\n` +
-        `3️⃣ Удобный день и время\n\n` +
-        `Или позвоните: ${PHONE}`,
-        {
-          chat_id: chatId,
-          message_id: messageId,
-          reply_markup: {
-            inline_keyboard: [
-              [{ text: '📱 Позвонить', url: PHONE_TEL }],
-              [{ text: '🏠 Главное меню', callback_data: 'main_menu' }]
-            ]
-          }
-        }
-      );
-    }
-    
-    // Вечерние игры
-    else if (data === 'evening') {
-      await bot.editMessageText(
-        `Вечерние игры 🌙\n\n` +
-        `🕐 18:00-23:00 — прайм-тайм\n` +
-        `Аренда корта: уточняйте по телефону\n\n` +
-        `☎️ ${PHONE}`,
-        {
-          chat_id: chatId,
-          message_id: messageId,
-          reply_markup: {
-            inline_keyboard: [
-              [{ text: '📱 Позвонить', url: PHONE_TEL }],
-              [{ text: '🏠 Главное меню', callback_data: 'main_menu' }]
-            ]
-          }
-        }
-      );
-    }
-    
-    // Что такое падел
-    else if (data === 'about') {
-      await bot.editMessageText(
-        `Что такое падел? 🎾\n\n` +
-        `Падел — это микс большого тенниса и сквоша:\n` +
-        `• Играют парами на закрытом корте\n` +
-        `• Корт окружён стенами (мяч отскакивает от них)\n` +
-        `• Ракетки без струн, лёгкие\n` +
-        `• Мяч как теннисный, но мягче\n\n` +
-        `Почему это круто:\n` +
-        `✅ Легко начать с нуля\n` +
-        `✅ Много движения, мало травм\n` +
-        `✅ Весело в компании\n` +
-        `✅ Можно в любую погоду (крытые корты)\n\n` +
-        `Больше на сайте: ${WEBSITE}`,
-        {
-          chat_id: chatId,
-          message_id: messageId,
-          reply_markup: {
-            inline_keyboard: [
-              [{ text: '🎾 Записаться на пробное', callback_data: 'trial_general' }],
-              [{ text: '🌐 Открыть сайт', url: WEBSITE }],
               [{ text: '🏠 Главное меню', callback_data: 'main_menu' }]
             ]
           }
@@ -310,7 +575,6 @@ bot.on('callback_query', async (query) => {
     
   } catch (error) {
     console.error('Callback error:', error.message);
-    // Пробуем ответить на callback чтобы убрать "часики"
     try {
       await bot.answerCallbackQuery(query.id, {
         text: 'Произошла ошибка, попробуйте снова',
@@ -351,16 +615,15 @@ bot.on('text', async (msg) => {
   
   // Отвечаем пользователю
   await bot.sendMessage(chatId, 
-    `Спасибо за сообщение! 📝\n\n` +
+    `Спасибо за сообщение, ${userName}! 📝\n\n` +
     `Администратор свяжется с вами в ближайшее время.\n\n` +
-    `Или звоните сами: ${PHONE}\n\n` +
+    `📞 Или звоните: ${PHONE}\n\n` +
     `📍 Падел 10/20\n` +
     `Московское шоссе, 105к10\n` +
     `⏰ 8:00-23:00 ежедневно`, 
     {
       reply_markup: {
         inline_keyboard: [
-          [{ text: '📱 Позвонить', url: PHONE_TEL }],
           [{ text: '🏠 Главное меню', callback_data: 'main_menu' }]
         ]
       }
@@ -375,4 +638,4 @@ bot.on('text', async (msg) => {
   );
 });
 
-console.log('🎾 Бот Падел 10/20 запущен с Supabase!');
+console.log('🎾 Бот Падел 10/20 запущен!');
