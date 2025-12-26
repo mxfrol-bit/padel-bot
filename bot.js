@@ -51,14 +51,6 @@ const mainMenu = {
   ]
 };
 
-// Кнопка возврата в главное меню
-const backButton = {
-  inline_keyboard: [
-    [{ text: '🏠 Главное меню', callback_data: 'main_menu' }],
-    [{ text: '📞 Связаться', callback_data: 'contacts' }]
-  ]
-};
-
 // Обработка /start
 bot.onText(/\/start(.*)/, async (msg, match) => {
   const chatId = msg.chat.id;
@@ -301,7 +293,7 @@ bot.on('text', async (msg) => {
   if (processedMessages.has(msgKey)) return;
   processedMessages.add(msgKey);
   
-  // Чистим кеш старых сообщений (храним только последние 100)
+  // Чистим кеш
   if (processedMessages.size > 100) {
     const arr = Array.from(processedMessages);
     processedMessages.clear();
