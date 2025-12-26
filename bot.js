@@ -34,8 +34,6 @@ async function logToSupabase(source, userName, username, chatId, action, message
     
     if (error) {
       console.error('Supabase error:', error);
-    } else {
-      console.log('✅ Logged to Supabase:', action);
     }
   } catch (err) {
     console.error('Supabase connection error:', err);
@@ -70,7 +68,7 @@ bot.onText(/\/start(.*)/, async (msg, match) => {
 
 Вы узнали о нас из листовки? Отлично! 
 
-🎾 *Падел* — это микс тенниса и сквоша
+🎾 Падел — это микс тенниса и сквоша
 Играют парами, правила простые
 Даже если никогда не держали ракетку — всё получится!
 
@@ -95,7 +93,7 @@ bot.onText(/\/start(.*)/, async (msg, match) => {
 
 Рады, что заинтересовались семейным паделом! 👨‍👩‍👧
 
-🎾 *Падел безопасен для детей от 6 лет:*
+🎾 Падел безопасен для детей от 6 лет:
 - Мягкий мяч
 - Закрытый корт
 - Тренер всё покажет
@@ -119,7 +117,7 @@ bot.onText(/\/start(.*)/, async (msg, match) => {
     source = 'direct';
     welcomeMessage = `Привет, ${userName}! 👋
 
-Я бот клуба *Падел 10/20* 🎾
+Я бот клуба Падел 10/20 🎾
 
 📍 Московское шоссе, 105к10
 ⏰ Работаем ежедневно 8:00-23:00
@@ -133,8 +131,7 @@ bot.onText(/\/start(.*)/, async (msg, match) => {
   await logToSupabase(source, userName, username, chatId, 'start', null);
   
   await bot.sendMessage(chatId, welcomeMessage, {
-    reply_markup: keyboard,
-    parse_mode: 'Markdown'
+    reply_markup: keyboard
   });
 });
 
@@ -149,28 +146,23 @@ bot.on('callback_query', async (query) => {
   // Логируем действие
   await logToSupabase('callback', userName, username, chatId, data, null);
   
-  // Главное меню
-  if (data === 'main_menu') {
-    try {
+  try {
+    // Главное меню
+    if (data === 'main_menu') {
       await bot.editMessageText(
-        `Привет, ${userName}! 👋\n\nЯ бот клуба *Падел 10/20* 🎾\n\n📍 Московское шоссе, 105к10\n⏰ Работаем ежедневно 8:00-23:00\n\nЧем могу помочь?`,
+        `Привет, ${userName}! 👋\n\nЯ бот клуба Падел 10/20 🎾\n\n📍 Московское шоссе, 105к10\n⏰ Работаем ежедневно 8:00-23:00\n\nЧем могу помочь?`,
         {
           chat_id: chatId,
           message_id: messageId,
-          parse_mode: 'Markdown',
           reply_markup: mainMenu
         }
       );
-    } catch (err) {
-      console.log('Edit error:', err.message);
     }
-  }
-  
-  // Контакты
-  else if (data === 'contacts') {
-    try {
+    
+    // Контакты
+    else if (data === 'contacts') {
       await bot.editMessageText(
-        `📞 *Контакты Падел 10/20*\n\n` +
+        `📞 Контакты Падел 10/20\n\n` +
         `☎️ Телефон: ${PHONE}\n` +
         `🌐 Сайт: ${WEBSITE}\n` +
         `💬 Чат клуба: присоединяйтесь!\n\n` +
@@ -179,7 +171,6 @@ bot.on('callback_query', async (query) => {
         {
           chat_id: chatId,
           message_id: messageId,
-          parse_mode: 'Markdown',
           reply_markup: {
             inline_keyboard: [
               [{ text: '📱 Позвонить', url: PHONE_TEL }],
@@ -192,17 +183,13 @@ bot.on('callback_query', async (query) => {
       );
       
       await bot.sendMessage(ADMIN_CHAT_ID, `📞 Пользователь ${userName} (@${username}) открыл контакты`);
-    } catch (err) {
-      console.log('Edit error:', err.message);
     }
-  }
-  
-  // Пробное занятие (общее)
-  else if (data === 'trial_general') {
-    try {
+    
+    // Пробное занятие (общее)
+    else if (data === 'trial_general') {
       await bot.editMessageText(
         `Отлично! Пробное занятие с тренером 🎾\n\n` +
-        `📅 *Доступные дни (будни):*\n` +
+        `📅 Доступные дни (будни):\n` +
         `Понедельник-пятница: 10:00-17:00\n` +
         `Стоимость: 1500₽ с человека\n\n` +
         `📝 Для записи напишите:\n` +
@@ -214,7 +201,6 @@ bot.on('callback_query', async (query) => {
         {
           chat_id: chatId,
           message_id: messageId,
-          parse_mode: 'Markdown',
           reply_markup: {
             inline_keyboard: [
               [{ text: '📱 Позвонить', url: PHONE_TEL }],
@@ -223,14 +209,10 @@ bot.on('callback_query', async (query) => {
           }
         }
       );
-    } catch (err) {
-      console.log('Edit error:', err.message);
     }
-  }
-  
-  // Семейное занятие
-  else if (data === 'trial_family') {
-    try {
+    
+    // Семейное занятие
+    else if (data === 'trial_family') {
       await bot.editMessageText(
         `Замечательно! Семейное занятие 👨‍👩‍👧\n\n` +
         `📋 Для записи напишите:\n` +
@@ -243,7 +225,6 @@ bot.on('callback_query', async (query) => {
         {
           chat_id: chatId,
           message_id: messageId,
-          parse_mode: 'Markdown',
           reply_markup: {
             inline_keyboard: [
               [{ text: '📱 Позвонить', url: PHONE_TEL }],
@@ -252,14 +233,10 @@ bot.on('callback_query', async (query) => {
           }
         }
       );
-    } catch (err) {
-      console.log('Edit error:', err.message);
     }
-  }
-  
-  // Взрослый сначала
-  else if (data === 'trial_adult') {
-    try {
+    
+    // Взрослый сначала
+    else if (data === 'trial_adult') {
       await bot.editMessageText(
         `Хорошая идея! Сначала попробуете сами 🎾\n\n` +
         `📝 Для записи напишите:\n` +
@@ -270,7 +247,6 @@ bot.on('callback_query', async (query) => {
         {
           chat_id: chatId,
           message_id: messageId,
-          parse_mode: 'Markdown',
           reply_markup: {
             inline_keyboard: [
               [{ text: '📱 Позвонить', url: PHONE_TEL }],
@@ -279,14 +255,10 @@ bot.on('callback_query', async (query) => {
           }
         }
       );
-    } catch (err) {
-      console.log('Edit error:', err.message);
     }
-  }
-  
-  // Вечерние игры
-  else if (data === 'evening') {
-    try {
+    
+    // Вечерние игры
+    else if (data === 'evening') {
       await bot.editMessageText(
         `Вечерние игры 🌙\n\n` +
         `🕐 18:00-23:00 — прайм-тайм\n` +
@@ -295,7 +267,6 @@ bot.on('callback_query', async (query) => {
         {
           chat_id: chatId,
           message_id: messageId,
-          parse_mode: 'Markdown',
           reply_markup: {
             inline_keyboard: [
               [{ text: '📱 Позвонить', url: PHONE_TEL }],
@@ -304,22 +275,18 @@ bot.on('callback_query', async (query) => {
           }
         }
       );
-    } catch (err) {
-      console.log('Edit error:', err.message);
     }
-  }
-  
-  // Что такое падел
-  else if (data === 'about') {
-    try {
+    
+    // Что такое падел
+    else if (data === 'about') {
       await bot.editMessageText(
-        `*Что такое падел?* 🎾\n\n` +
+        `Что такое падел? 🎾\n\n` +
         `Падел — это микс большого тенниса и сквоша:\n` +
         `• Играют парами на закрытом корте\n` +
         `• Корт окружён стенами (мяч отскакивает от них)\n` +
         `• Ракетки без струн, лёгкие\n` +
         `• Мяч как теннисный, но мягче\n\n` +
-        `*Почему это круто:*\n` +
+        `Почему это круто:\n` +
         `✅ Легко начать с нуля\n` +
         `✅ Много движения, мало травм\n` +
         `✅ Весело в компании\n` +
@@ -328,7 +295,6 @@ bot.on('callback_query', async (query) => {
         {
           chat_id: chatId,
           message_id: messageId,
-          parse_mode: 'Markdown',
           reply_markup: {
             inline_keyboard: [
               [{ text: '🎾 Записаться на пробное', callback_data: 'trial_general' }],
@@ -338,12 +304,22 @@ bot.on('callback_query', async (query) => {
           }
         }
       );
-    } catch (err) {
-      console.log('Edit error:', err.message);
+    }
+    
+    await bot.answerCallbackQuery(query.id);
+    
+  } catch (error) {
+    console.error('Callback error:', error.message);
+    // Пробуем ответить на callback чтобы убрать "часики"
+    try {
+      await bot.answerCallbackQuery(query.id, {
+        text: 'Произошла ошибка, попробуйте снова',
+        show_alert: false
+      });
+    } catch (e) {
+      console.error('Answer callback error:', e.message);
     }
   }
-  
-  await bot.answerCallbackQuery(query.id);
 });
 
 // Обработка текстовых сообщений
