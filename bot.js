@@ -114,7 +114,7 @@ bot.on('callback_query', async (query) => {
     });
   }
   
-  if (data === 'trial_family') {
+  else if (data === 'trial_family') {
     await bot.sendMessage(chatId, `Замечательно! Семейное занятие 👨‍👩‍👧
 
 📋 Для записи напишите:
@@ -131,7 +131,7 @@ bot.on('callback_query', async (query) => {
     });
   }
   
-  if (data === 'trial_adult') {
+  else if (data === 'trial_adult') {
     await bot.sendMessage(chatId, `Хорошая идея! Сначала попробуете сами 🎾
 
 📝 Для записи напишите:
@@ -146,7 +146,7 @@ bot.on('callback_query', async (query) => {
     });
   }
   
-  if (data === 'evening') {
+  else if (data === 'evening') {
     await bot.sendMessage(chatId, `Вечерние игры 🌙
 
 🕐 18:00-23:00 — прайм-тайм
@@ -159,7 +159,7 @@ bot.on('callback_query', async (query) => {
     });
   }
   
-  if (data === 'callback') {
+  else if (data === 'callback') {
     await bot.sendMessage(chatId, `Отлично! 📞
 
 Напишите:
@@ -172,7 +172,7 @@ bot.on('callback_query', async (query) => {
     await bot.sendMessage(ADMIN_CHAT_ID, `📞 Запрос обратного звонка от ${userName} (@${query.from.username || 'нет username'})`);
   }
   
-  if (data === 'about') {
+  else if (data === 'about') {
     await bot.sendMessage(chatId, `*Что такое падел?* 🎾
 
 Падел — это микс большого тенниса и сквоша:
@@ -201,32 +201,46 @@ bot.on('callback_query', async (query) => {
   await bot.answerCallbackQuery(query.id);
 });
 
-// Обработка текстовых сообщений - ИСПРАВЛЕННАЯ ВЕРСИЯ
-bot.on('message', async (msg) => {
-  // Игнорируем команды, сообщения от бота и callback
-  if (msg.text && 
-      !msg.text.startsWith('/') && 
-      !msg.from.is_bot && 
-      !msg.reply_to_message) {
-    
-    const chatId = msg.chat.id;
-    const userName = msg.from.first_name || 'Пользователь';
-    const username = msg.from.username ? `@${msg.from.username}` : 'нет username';
-    
-    await bot.sendMessage(chatId, `Спасибо за сообщение! 📝
+// Обработка текстовых сообщений - ПОЛНОСТЬЮ ПЕРЕПИСАННАЯ ВЕРСИЯ
+const processedMessages = new Set();
+
+bot.on('text', async (msg) => {
+  // Пропускаем команды
+  if (msg.text.startsWith('/')) return;
+  
+  // Пропускаем уже обработанные сообщения
+  const msgKey = `${msg.chat.id}_${msg.message_id}`;
+  if (processedMessages.has(msgKey)) return;
+  processedMessages.add(msgKey);
+  
+  // Чистим кеш старых сообщений (храним только последние 100)
+  if (processedMessages.size > 100) {
+    const arr = Array.from(processedMessages);
+    processedMessages.clear();
+    arr.slice(-50).forEach(key => processedMessages.add(key));
+  }
+  
+  const chatId = msg.chat.id;
+  const userName = msg.from.first_name || 'Пользователь';
+  const username = msg.from.username ? `@${msg.from.username}` : 'нет username';
+  const userMessage = msg.text;
+  
+  // Отвечаем пользователю
+  await bot.sendMessage(chatId, `Спасибо за сообщение! 📝
 
 Администратор свяжется с вами в ближайшее время.
 
 📍 Падел 10/20
 Московское шоссе, 105к10
 ⏰ 8:00-23:00 ежедневно`);
-    
-    await bot.sendMessage(ADMIN_CHAT_ID, `📩 *Новое сообщение от клиента*
-
-Имя: ${userName} (${username})
-Сообщение:
-_${msg.text}_`, { parse_mode: 'Markdown' });
-  }
+  
+  // Уведомляем админа БЕЗ MARKDOWN (чтобы избежать ошибок парсинга)
+  await bot.sendMessage(ADMIN_CHAT_ID, 
+    `📩 Новое сообщение от клиента\n\n` +
+    `Имя: ${userName} (${username})\n` +
+    `Сообщение:\n${userMessage}`
+  );
 });
 
 console.log('🎾 Бот Падел 10/20 запущен!');
+```
