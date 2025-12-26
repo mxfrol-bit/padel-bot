@@ -12,13 +12,14 @@ const supabase = createClient(
 
 const ADMIN_CHAT_ID = '562890944';
 const PHONE = '8 (920) 048-22-72';
+const PHONE_TEL = 'tel:+79200482272';
 const WEBSITE = 'https://padel1020.ru';
 const CHAT_LINK = 'https://t.me/+CRrPn7qJB3phNDUy';
 
 // Функция логирования в Supabase
 async function logToSupabase(source, userName, username, chatId, action, message = null) {
   try {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('leads')
       .insert([
         {
@@ -140,6 +141,7 @@ bot.onText(/\/start(.*)/, async (msg, match) => {
 // Обработка кнопок
 bot.on('callback_query', async (query) => {
   const chatId = query.message.chat.id;
+  const messageId = query.message.message_id;
   const data = query.data;
   const userName = query.from.first_name || 'Друг';
   const username = query.from.username || 'no_username';
@@ -149,133 +151,196 @@ bot.on('callback_query', async (query) => {
   
   // Главное меню
   if (data === 'main_menu') {
-    await bot.editMessageText(
-      `Привет, ${userName}! 👋\n\nЯ бот клуба *Падел 10/20* 🎾\n\n📍 Московское шоссе, 105к10\n⏰ Работаем ежедневно 8:00-23:00\n\nЧем могу помочь?`,
-      {
-        chat_id: chatId,
-        message_id: query.message.message_id,
-        parse_mode: 'Markdown',
-        reply_markup: mainMenu
-      }
-    );
+    try {
+      await bot.editMessageText(
+        `Привет, ${userName}! 👋\n\nЯ бот клуба *Падел 10/20* 🎾\n\n📍 Московское шоссе, 105к10\n⏰ Работаем ежедневно 8:00-23:00\n\nЧем могу помочь?`,
+        {
+          chat_id: chatId,
+          message_id: messageId,
+          parse_mode: 'Markdown',
+          reply_markup: mainMenu
+        }
+      );
+    } catch (err) {
+      console.log('Edit error:', err.message);
+    }
   }
   
   // Контакты
   else if (data === 'contacts') {
-    await bot.editMessageText(
-      `📞 *Контакты Падел 10/20*\n\n` +
-      `☎️ Телефон: ${PHONE}\n` +
-      `🌐 Сайт: ${WEBSITE}\n` +
-      `💬 Чат клуба: присоединяйтесь!\n\n` +
-      `📍 Адрес: Московское шоссе, 105к10\n` +
-      `⏰ Ежедневно 8:00-23:00`,
-      {
-        chat_id: chatId,
-        message_id: query.message.message_id,
-        parse_mode: 'Markdown',
-        reply_markup: {
-          inline_keyboard: [
-            [{ text: '📱 Позвонить', url: `tel:${PHONE.replace(/[^\d+]/g, '')}` }],
-            [{ text: '🌐 Открыть сайт', url: WEBSITE }],
-            [{ text: '💬 Чат клуба', url: CHAT_LINK }],
-            [{ text: '🏠 Главное меню', callback_data: 'main_menu' }]
-          ]
+    try {
+      await bot.editMessageText(
+        `📞 *Контакты Падел 10/20*\n\n` +
+        `☎️ Телефон: ${PHONE}\n` +
+        `🌐 Сайт: ${WEBSITE}\n` +
+        `💬 Чат клуба: присоединяйтесь!\n\n` +
+        `📍 Адрес: Московское шоссе, 105к10\n` +
+        `⏰ Ежедневно 8:00-23:00`,
+        {
+          chat_id: chatId,
+          message_id: messageId,
+          parse_mode: 'Markdown',
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: '📱 Позвонить', url: PHONE_TEL }],
+              [{ text: '🌐 Открыть сайт', url: WEBSITE }],
+              [{ text: '💬 Чат клуба', url: CHAT_LINK }],
+              [{ text: '🏠 Главное меню', callback_data: 'main_menu' }]
+            ]
+          }
         }
-      }
-    );
-    
-    await bot.sendMessage(ADMIN_CHAT_ID, `📞 Пользователь ${userName} (@${username}) открыл контакты`);
+      );
+      
+      await bot.sendMessage(ADMIN_CHAT_ID, `📞 Пользователь ${userName} (@${username}) открыл контакты`);
+    } catch (err) {
+      console.log('Edit error:', err.message);
+    }
   }
   
   // Пробное занятие (общее)
   else if (data === 'trial_general') {
-    await bot.editMessageText(
-      `Отлично! Пробное занятие с тренером 🎾\n\n📅 *Доступные дни (будни):*\nПонедельник-пятница: 10:00-17:00\nСтоимость: 1500₽ с человека\n\n📝 Для записи напишите:\n1️⃣ Ваше имя\n2️⃣ Телефон\n3️⃣ Удобный день и время\n4️⃣ Сколько человек?\n\nИли позвоните: ${PHONE}`,
-      {
-        chat_id: chatId,
-        message_id: query.message.message_id,
-        parse_mode: 'Markdown',
-        reply_markup: {
-          inline_keyboard: [
-            [{ text: '📱 Позвонить', url: `tel:${PHONE.replace(/[^\d+]/g, '')}` }],
-            [{ text: '🏠 Главное меню', callback_data: 'main_menu' }]
-          ]
+    try {
+      await bot.editMessageText(
+        `Отлично! Пробное занятие с тренером 🎾\n\n` +
+        `📅 *Доступные дни (будни):*\n` +
+        `Понедельник-пятница: 10:00-17:00\n` +
+        `Стоимость: 1500₽ с человека\n\n` +
+        `📝 Для записи напишите:\n` +
+        `1️⃣ Ваше имя\n` +
+        `2️⃣ Телефон\n` +
+        `3️⃣ Удобный день и время\n` +
+        `4️⃣ Сколько человек?\n\n` +
+        `Или позвоните: ${PHONE}`,
+        {
+          chat_id: chatId,
+          message_id: messageId,
+          parse_mode: 'Markdown',
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: '📱 Позвонить', url: PHONE_TEL }],
+              [{ text: '🏠 Главное меню', callback_data: 'main_menu' }]
+            ]
+          }
         }
-      }
-    );
+      );
+    } catch (err) {
+      console.log('Edit error:', err.message);
+    }
   }
   
   // Семейное занятие
   else if (data === 'trial_family') {
-    await bot.editMessageText(
-      `Замечательно! Семейное занятие 👨‍👩‍👧\n\n📋 Для записи напишите:\n1️⃣ Ваше имя\n2️⃣ Телефон\n3️⃣ Сколько взрослых и детей?\n4️⃣ Возраст детей\n5️⃣ Удобный день и время\n\nИли позвоните: ${PHONE}`,
-      {
-        chat_id: chatId,
-        message_id: query.message.message_id,
-        parse_mode: 'Markdown',
-        reply_markup: {
-          inline_keyboard: [
-            [{ text: '📱 Позвонить', url: `tel:${PHONE.replace(/[^\d+]/g, '')}` }],
-            [{ text: '🏠 Главное меню', callback_data: 'main_menu' }]
-          ]
+    try {
+      await bot.editMessageText(
+        `Замечательно! Семейное занятие 👨‍👩‍👧\n\n` +
+        `📋 Для записи напишите:\n` +
+        `1️⃣ Ваше имя\n` +
+        `2️⃣ Телефон\n` +
+        `3️⃣ Сколько взрослых и детей?\n` +
+        `4️⃣ Возраст детей\n` +
+        `5️⃣ Удобный день и время\n\n` +
+        `Или позвоните: ${PHONE}`,
+        {
+          chat_id: chatId,
+          message_id: messageId,
+          parse_mode: 'Markdown',
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: '📱 Позвонить', url: PHONE_TEL }],
+              [{ text: '🏠 Главное меню', callback_data: 'main_menu' }]
+            ]
+          }
         }
-      }
-    );
+      );
+    } catch (err) {
+      console.log('Edit error:', err.message);
+    }
   }
   
   // Взрослый сначала
   else if (data === 'trial_adult') {
-    await bot.editMessageText(
-      `Хорошая идея! Сначала попробуете сами 🎾\n\n📝 Для записи напишите:\n1️⃣ Ваше имя\n2️⃣ Телефон\n3️⃣ Удобный день и время\n\nИли позвоните: ${PHONE}`,
-      {
-        chat_id: chatId,
-        message_id: query.message.message_id,
-        parse_mode: 'Markdown',
-        reply_markup: {
-          inline_keyboard: [
-            [{ text: '📱 Позвонить', url: `tel:${PHONE.replace(/[^\d+]/g, '')}` }],
-            [{ text: '🏠 Главное меню', callback_data: 'main_menu' }]
-          ]
+    try {
+      await bot.editMessageText(
+        `Хорошая идея! Сначала попробуете сами 🎾\n\n` +
+        `📝 Для записи напишите:\n` +
+        `1️⃣ Ваше имя\n` +
+        `2️⃣ Телефон\n` +
+        `3️⃣ Удобный день и время\n\n` +
+        `Или позвоните: ${PHONE}`,
+        {
+          chat_id: chatId,
+          message_id: messageId,
+          parse_mode: 'Markdown',
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: '📱 Позвонить', url: PHONE_TEL }],
+              [{ text: '🏠 Главное меню', callback_data: 'main_menu' }]
+            ]
+          }
         }
-      }
-    );
+      );
+    } catch (err) {
+      console.log('Edit error:', err.message);
+    }
   }
   
   // Вечерние игры
   else if (data === 'evening') {
-    await bot.editMessageText(
-      `Вечерние игры 🌙\n\n🕐 18:00-23:00 — прайм-тайм\nАренда корта: уточняйте по телефону\n\n☎️ ${PHONE}`,
-      {
-        chat_id: chatId,
-        message_id: query.message.message_id,
-        parse_mode: 'Markdown',
-        reply_markup: {
-          inline_keyboard: [
-            [{ text: '📱 Позвонить', url: `tel:${PHONE.replace(/[^\d+]/g, '')}` }],
-            [{ text: '🏠 Главное меню', callback_data: 'main_menu' }]
-          ]
+    try {
+      await bot.editMessageText(
+        `Вечерние игры 🌙\n\n` +
+        `🕐 18:00-23:00 — прайм-тайм\n` +
+        `Аренда корта: уточняйте по телефону\n\n` +
+        `☎️ ${PHONE}`,
+        {
+          chat_id: chatId,
+          message_id: messageId,
+          parse_mode: 'Markdown',
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: '📱 Позвонить', url: PHONE_TEL }],
+              [{ text: '🏠 Главное меню', callback_data: 'main_menu' }]
+            ]
+          }
         }
-      }
-    );
+      );
+    } catch (err) {
+      console.log('Edit error:', err.message);
+    }
   }
   
   // Что такое падел
   else if (data === 'about') {
-    await bot.editMessageText(
-      `*Что такое падел?* 🎾\n\nПадел — это микс большого тенниса и сквоша:\n• Играют парами на закрытом корте\n• Корт окружён стенами (мяч отскакивает от них)\n• Ракетки без струн, лёгкие\n• Мяч как теннисный, но мягче\n\n*Почему это круто:*\n✅ Легко начать с нуля\n✅ Много движения, мало травм\n✅ Весело в компании\n✅ Можно в любую погоду (крытые корты)\n\nБольше на сайте: ${WEBSITE}`,
-      {
-        chat_id: chatId,
-        message_id: query.message.message_id,
-        parse_mode: 'Markdown',
-        reply_markup: {
-          inline_keyboard: [
-            [{ text: '🎾 Записаться на пробное', callback_data: 'trial_general' }],
-            [{ text: '🌐 Открыть сайт', url: WEBSITE }],
-            [{ text: '🏠 Главное меню', callback_data: 'main_menu' }]
-          ]
+    try {
+      await bot.editMessageText(
+        `*Что такое падел?* 🎾\n\n` +
+        `Падел — это микс большого тенниса и сквоша:\n` +
+        `• Играют парами на закрытом корте\n` +
+        `• Корт окружён стенами (мяч отскакивает от них)\n` +
+        `• Ракетки без струн, лёгкие\n` +
+        `• Мяч как теннисный, но мягче\n\n` +
+        `*Почему это круто:*\n` +
+        `✅ Легко начать с нуля\n` +
+        `✅ Много движения, мало травм\n` +
+        `✅ Весело в компании\n` +
+        `✅ Можно в любую погоду (крытые корты)\n\n` +
+        `Больше на сайте: ${WEBSITE}`,
+        {
+          chat_id: chatId,
+          message_id: messageId,
+          parse_mode: 'Markdown',
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: '🎾 Записаться на пробное', callback_data: 'trial_general' }],
+              [{ text: '🌐 Открыть сайт', url: WEBSITE }],
+              [{ text: '🏠 Главное меню', callback_data: 'main_menu' }]
+            ]
+          }
         }
-      }
-    );
+      );
+    } catch (err) {
+      console.log('Edit error:', err.message);
+    }
   }
   
   await bot.answerCallbackQuery(query.id);
@@ -319,7 +384,7 @@ bot.on('text', async (msg) => {
     {
       reply_markup: {
         inline_keyboard: [
-          [{ text: '📱 Позвонить', url: `tel:${PHONE.replace(/[^\d+]/g, '')}` }],
+          [{ text: '📱 Позвонить', url: PHONE_TEL }],
           [{ text: '🏠 Главное меню', callback_data: 'main_menu' }]
         ]
       }
