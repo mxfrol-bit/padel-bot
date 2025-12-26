@@ -4,6 +4,9 @@ const token = process.env.BOT_TOKEN;
 const bot = new TelegramBot(token, { polling: true });
 
 const ADMIN_CHAT_ID = '562890944';
+const PHONE = '8 (920) 048-22-72';
+const WEBSITE = 'https://padel1020.ru';
+const CHAT_LINK = 'https://t.me/+CRrPn7qJB3phNDUy';
 
 // Главное меню
 const mainMenu = {
@@ -11,7 +14,7 @@ const mainMenu = {
     [{ text: '📅 Забронировать корт', url: 'https://n1488777.yclients.com/' }],
     [{ text: 'ℹ️ Что такое падел?', callback_data: 'about' }],
     [{ text: '🎾 Пробное занятие', callback_data: 'trial_general' }],
-    [{ text: '📞 Связаться', callback_data: 'callback' }]
+    [{ text: '📞 Связаться', callback_data: 'contacts' }]
   ]
 };
 
@@ -19,7 +22,7 @@ const mainMenu = {
 const backButton = {
   inline_keyboard: [
     [{ text: '🏠 Главное меню', callback_data: 'main_menu' }],
-    [{ text: '📞 Позвоните мне', callback_data: 'callback' }]
+    [{ text: '📞 Связаться', callback_data: 'contacts' }]
   ]
 };
 
@@ -49,7 +52,7 @@ bot.onText(/\/start(.*)/, async (msg, match) => {
         [{ text: '🎾 Пробное занятие (1500₽)', callback_data: 'trial_general' }],
         [{ text: '👥 Вечерние игры', callback_data: 'evening' }],
         [{ text: 'ℹ️ Что такое падел?', callback_data: 'about' }],
-        [{ text: '📞 Позвоните мне', callback_data: 'callback' }]
+        [{ text: '📞 Связаться', callback_data: 'contacts' }]
       ]
     };
     
@@ -63,9 +66,9 @@ bot.onText(/\/start(.*)/, async (msg, match) => {
 Рады, что заинтересовались семейным паделом! 👨‍👩‍👧
 
 🎾 *Падел безопасен для детей от 6 лет:*
-• Мягкий мяч
-• Закрытый корт
-• Тренер всё покажет
+- Мягкий мяч
+- Закрытый корт
+- Тренер всё покажет
 
 Можем предложить:`;
     
@@ -74,7 +77,7 @@ bot.onText(/\/start(.*)/, async (msg, match) => {
         [{ text: '👨‍👩‍👧 Семейное занятие', callback_data: 'trial_family' }],
         [{ text: '🧍 Сначала попробую сам(а)', callback_data: 'trial_adult' }],
         [{ text: 'ℹ️ Что такое падел?', callback_data: 'about' }],
-        [{ text: '📞 Позвоните мне', callback_data: 'callback' }]
+        [{ text: '📞 Связаться', callback_data: 'contacts' }]
       ]
     };
     
@@ -120,15 +123,47 @@ bot.on('callback_query', async (query) => {
     );
   }
   
-  // Пробное занятие (общее)
-  else if (data === 'trial_general') {
+  // Контакты
+  else if (data === 'contacts') {
     await bot.editMessageText(
-      `Отлично! Пробное занятие с тренером 🎾\n\n📅 *Доступные дни (будни):*\nПонедельник-пятница: 10:00-17:00\nСтоимость: 1500₽ с человека\n\n📝 Для записи напишите:\n1️⃣ Ваше имя\n2️⃣ Телефон\n3️⃣ Удобный день и время\n4️⃣ Сколько человек?`,
+      `📞 *Контакты Падел 10/20*\n\n` +
+      `☎️ Телефон: ${PHONE}\n` +
+      `🌐 Сайт: ${WEBSITE}\n` +
+      `💬 Чат клуба: присоединяйтесь!\n\n` +
+      `📍 Адрес: Московское шоссе, 105к10\n` +
+      `⏰ Ежедневно 8:00-23:00`,
       {
         chat_id: chatId,
         message_id: query.message.message_id,
         parse_mode: 'Markdown',
-        reply_markup: backButton
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: '📱 Позвонить', url: `tel:${PHONE.replace(/[^\d+]/g, '')}` }],
+            [{ text: '🌐 Открыть сайт', url: WEBSITE }],
+            [{ text: '💬 Чат клуба', url: CHAT_LINK }],
+            [{ text: '🏠 Главное меню', callback_data: 'main_menu' }]
+          ]
+        }
+      }
+    );
+    
+    await bot.sendMessage(ADMIN_CHAT_ID, `📞 Пользователь ${userName} (@${query.from.username || 'нет username'}) открыл контакты`);
+  }
+  
+  // Пробное занятие (общее)
+  else if (data === 'trial_general') {
+    await bot.editMessageText(
+      `Отлично! Пробное занятие с тренером 🎾\n\n📅 *Доступные дни (будни):*\nПонедельник-пятница: 10:00-17:00\nСтоимость: 1500₽ с человека\n\n📝 Для записи напишите:\n1️⃣ Ваше имя\n2️⃣ Телефон\n3️⃣ Удобный день и время\n4️⃣ Сколько человек?\n\nИли позвоните: ${PHONE}`,
+      {
+        chat_id: chatId,
+        message_id: query.message.message_id,
+        parse_mode: 'Markdown',
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: '📱 Позвонить', url: `tel:${PHONE.replace(/[^\d+]/g, '')}` }],
+            [{ text: '🏠 Главное меню', callback_data: 'main_menu' }]
+          ]
+        }
       }
     );
   }
@@ -136,11 +171,17 @@ bot.on('callback_query', async (query) => {
   // Семейное занятие
   else if (data === 'trial_family') {
     await bot.editMessageText(
-      `Замечательно! Семейное занятие 👨‍👩‍👧\n\n📋 Для записи напишите:\n1️⃣ Ваше имя\n2️⃣ Телефон\n3️⃣ Сколько взрослых и детей?\n4️⃣ Возраст детей\n5️⃣ Удобный день и время`,
+      `Замечательно! Семейное занятие 👨‍👩‍👧\n\n📋 Для записи напишите:\n1️⃣ Ваше имя\n2️⃣ Телефон\n3️⃣ Сколько взрослых и детей?\n4️⃣ Возраст детей\n5️⃣ Удобный день и время\n\nИли позвоните: ${PHONE}`,
       {
         chat_id: chatId,
         message_id: query.message.message_id,
-        reply_markup: backButton
+        parse_mode: 'Markdown',
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: '📱 Позвонить', url: `tel:${PHONE.replace(/[^\d+]/g, '')}` }],
+            [{ text: '🏠 Главное меню', callback_data: 'main_menu' }]
+          ]
+        }
       }
     );
   }
@@ -148,11 +189,17 @@ bot.on('callback_query', async (query) => {
   // Взрослый сначала
   else if (data === 'trial_adult') {
     await bot.editMessageText(
-      `Хорошая идея! Сначала попробуете сами 🎾\n\n📝 Для записи напишите:\n1️⃣ Ваше имя\n2️⃣ Телефон\n3️⃣ Удобный день и время`,
+      `Хорошая идея! Сначала попробуете сами 🎾\n\n📝 Для записи напишите:\n1️⃣ Ваше имя\n2️⃣ Телефон\n3️⃣ Удобный день и время\n\nИли позвоните: ${PHONE}`,
       {
         chat_id: chatId,
         message_id: query.message.message_id,
-        reply_markup: backButton
+        parse_mode: 'Markdown',
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: '📱 Позвонить', url: `tel:${PHONE.replace(/[^\d+]/g, '')}` }],
+            [{ text: '🏠 Главное меню', callback_data: 'main_menu' }]
+          ]
+        }
       }
     );
   }
@@ -160,35 +207,25 @@ bot.on('callback_query', async (query) => {
   // Вечерние игры
   else if (data === 'evening') {
     await bot.editMessageText(
-      `Вечерние игры 🌙\n\n🕐 18:00-23:00 — прайм-тайм\nАренда корта: уточняйте по телефону`,
+      `Вечерние игры 🌙\n\n🕐 18:00-23:00 — прайм-тайм\nАренда корта: уточняйте по телефону\n\n☎️ ${PHONE}`,
       {
         chat_id: chatId,
         message_id: query.message.message_id,
-        reply_markup: backButton
-      }
-    );
-  }
-  
-  // Обратный звонок
-  else if (data === 'callback') {
-    await bot.editMessageText(
-      `Отлично! 📞\n\nНапишите:\n1️⃣ Ваше имя\n2️⃣ Телефон\n3️⃣ Удобное время для звонка\n\nПерезвоним в течение часа! ⏱`,
-      {
-        chat_id: chatId,
-        message_id: query.message.message_id,
+        parse_mode: 'Markdown',
         reply_markup: {
-          inline_keyboard: [[{ text: '🏠 Главное меню', callback_data: 'main_menu' }]]
+          inline_keyboard: [
+            [{ text: '📱 Позвонить', url: `tel:${PHONE.replace(/[^\d+]/g, '')}` }],
+            [{ text: '🏠 Главное меню', callback_data: 'main_menu' }]
+          ]
         }
       }
     );
-    
-    await bot.sendMessage(ADMIN_CHAT_ID, `📞 Запрос обратного звонка от ${userName} (@${query.from.username || 'нет username'})`);
   }
   
   // Что такое падел
   else if (data === 'about') {
     await bot.editMessageText(
-      `*Что такое падел?* 🎾\n\nПадел — это микс большого тенниса и сквоша:\n• Играют парами на закрытом корте\n• Корт окружён стенами (мяч отскакивает от них)\n• Ракетки без струн, лёгкие\n• Мяч как теннисный, но мягче\n\n*Почему это круто:*\n✅ Легко начать с нуля\n✅ Много движения, мало травм\n✅ Весело в компании\n✅ Можно в любую погоду (крытые корты)`,
+      `*Что такое падел?* 🎾\n\nПадел — это микс большого тенниса и сквоша:\n• Играют парами на закрытом корте\n• Корт окружён стенами (мяч отскакивает от них)\n• Ракетки без струн, лёгкие\n• Мяч как теннисный, но мягче\n\n*Почему это круто:*\n✅ Легко начать с нуля\n✅ Много движения, мало травм\n✅ Весело в компании\n✅ Можно в любую погоду (крытые корты)\n\nБольше на сайте: ${WEBSITE}`,
       {
         chat_id: chatId,
         message_id: query.message.message_id,
@@ -196,6 +233,7 @@ bot.on('callback_query', async (query) => {
         reply_markup: {
           inline_keyboard: [
             [{ text: '🎾 Записаться на пробное', callback_data: 'trial_general' }],
+            [{ text: '🌐 Открыть сайт', url: WEBSITE }],
             [{ text: '🏠 Главное меню', callback_data: 'main_menu' }]
           ]
         }
@@ -231,9 +269,22 @@ bot.on('text', async (msg) => {
   const userMessage = msg.text;
   
   // Отвечаем пользователю
-  await bot.sendMessage(chatId, `Спасибо за сообщение! 📝\n\nАдминистратор свяжется с вами в ближайшее время.\n\n📍 Падел 10/20\nМосковское шоссе, 105к10\n⏰ 8:00-23:00 ежедневно`, {
-    reply_markup: mainMenu
-  });
+  await bot.sendMessage(chatId, 
+    `Спасибо за сообщение! 📝\n\n` +
+    `Администратор свяжется с вами в ближайшее время.\n\n` +
+    `Или звоните сами: ${PHONE}\n\n` +
+    `📍 Падел 10/20\n` +
+    `Московское шоссе, 105к10\n` +
+    `⏰ 8:00-23:00 ежедневно`, 
+    {
+      reply_markup: {
+        inline_keyboard: [
+          [{ text: '📱 Позвонить', url: `tel:${PHONE.replace(/[^\d+]/g, '')}` }],
+          [{ text: '🏠 Главное меню', callback_data: 'main_menu' }]
+        ]
+      }
+    }
+  );
   
   // Уведомляем админа БЕЗ MARKDOWN
   await bot.sendMessage(ADMIN_CHAT_ID, 
