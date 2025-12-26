@@ -74,7 +74,7 @@ bot.onText(/\/start(.*)/, async (msg, match) => {
     
     keyboard = {
       inline_keyboard: [
-        [{ text: '📅 Забронировать корт', url: 'https://n943508.yclients.com/' }],
+        [{ text: '📅 Забронировать корт', url: 'https://n1488777.yclients.com/' }],
         [{ text: 'ℹ️ Что такое падел?', callback_data: 'about' }],
         [{ text: '📞 Связаться', callback_data: 'callback' }]
       ]
@@ -201,9 +201,14 @@ bot.on('callback_query', async (query) => {
   await bot.answerCallbackQuery(query.id);
 });
 
-// Обработка текстовых сообщений
+// Обработка текстовых сообщений - ИСПРАВЛЕННАЯ ВЕРСИЯ
 bot.on('message', async (msg) => {
-  if (msg.text && !msg.text.startsWith('/') && !msg.text.startsWith('🎾')) {
+  // Игнорируем команды, сообщения от бота и callback
+  if (msg.text && 
+      !msg.text.startsWith('/') && 
+      !msg.from.is_bot && 
+      !msg.reply_to_message) {
+    
     const chatId = msg.chat.id;
     const userName = msg.from.first_name || 'Пользователь';
     const username = msg.from.username ? `@${msg.from.username}` : 'нет username';
