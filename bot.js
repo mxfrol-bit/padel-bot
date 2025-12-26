@@ -15,7 +15,7 @@ const PHONE = '8 (920) 048-22-72';
 const WEBSITE = 'https://padel1020.ru';
 const CHAT_LINK = 'https://t.me/+CRrPn7qJB3phNDUy';
 const BOOKING_LINK = 'https://n1488777.yclients.com/';
-const ONLY_HER_LINK = 'https://n1488777.yclients.com/group-events-widget';
+const ONLY_GIRL_LINK = 'https://n1488777.yclients.com/group-events-widget';
 
 // Функция логирования в Supabase
 async function logToSupabase(source, userName, username, chatId, action, message = null) {
@@ -214,7 +214,7 @@ bot.on('callback_query', async (query) => {
         `2️⃣ АРЕНДА КОРТА СО СКИДКОЙ\n` +
         `1500₽/час (будни до 17:00)\n` +
         `Не входит: тренер, ракетки, мячи\n\n` +
-        `3️⃣ ONLY HER — бесплатно для девушек!\n` +
+        `3️⃣ ONLY GIRL — бесплатно для девушек!\n` +
         `Специальные дни для женских игр\n` +
         `⚠️ Ракетки не входят в стоимость\n\n` +
         `Выберите что интересует:`,
@@ -224,7 +224,7 @@ bot.on('callback_query', async (query) => {
           reply_markup: {
             inline_keyboard: [
               [{ text: '🎾 Пробная тренировка', callback_data: 'trial_start' }],
-              [{ text: '👭 Only Her (расписание)', url: ONLY_HER_LINK }],
+              [{ text: '👭 Only Girl (расписание)', url: ONLY_GIRL_LINK }],
               [{ text: '📅 Забронировать корт', url: BOOKING_LINK }],
               [{ text: '🏠 Главное меню', callback_data: 'main_menu' }]
             ]
@@ -346,8 +346,7 @@ bot.on('callback_query', async (query) => {
         `Что взять на пробное занятие? 👟\n\n` +
         `Нужно:\n` +
         `✅ Спортивная одежда\n` +
-        `✅ Кроссовки с нескользящей подошвой\n` +
-        `✅ Вода (есть кулер в клубе)\n\n` +
+        `✅ Кроссовки с нескользящей подошвой\n\n` +
         `НЕ нужно:\n` +
         `❌ Ракетки — дарим в подарок!\n` +
         `❌ Мячи — предоставляем\n` +
@@ -420,7 +419,7 @@ bot.on('callback_query', async (query) => {
           reply_markup: {
             inline_keyboard: [
               [{ text: '📝 Записаться', callback_data: 'trial_book' }],
-              [{ text: '💳 Семейные абонементы', callback_data: 'subscriptions' }],
+              [{ text: '💳 Абонементы', callback_data: 'subscriptions' }],
               [{ text: '🏠 Главное меню', callback_data: 'main_menu' }]
             ]
           }
