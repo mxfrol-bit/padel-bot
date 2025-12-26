@@ -1,12 +1,45 @@
 import TelegramBot from 'node-telegram-bot-api';
+import { createClient } from '@supabase/supabase-js';
 
 const token = process.env.BOT_TOKEN;
 const bot = new TelegramBot(token, { polling: true });
+
+// Supabase
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY
+);
 
 const ADMIN_CHAT_ID = '562890944';
 const PHONE = '8 (920) 048-22-72';
 const WEBSITE = 'https://padel1020.ru';
 const CHAT_LINK = 'https://t.me/+CRrPn7qJB3phNDUy';
+
+// Функция логирования в Supabase
+async function logToSupabase(source, userName, username, chatId, action, message = null) {
+  try {
+    const { data, error } = await supabase
+      .from('leads')
+      .insert([
+        {
+          source: source,
+          user_name: userName,
+          username: username,
+          chat_id: chatId.toString(),
+          action: action,
+          message: message
+        }
+      ]);
+    
+    if (error) {
+      console.error('Supabase error:', error);
+    } else {
+      console.log('✅ Logged to Supabase:', action);
+    }
+  } catch (err) {
+    console.error('Supabase connection error:', err);
+  }
+}
 
 // Главное меню
 const mainMenu = {
@@ -31,12 +64,15 @@ bot.onText(/\/start(.*)/, async (msg, match) => {
   const chatId = msg.chat.id;
   const startParam = match[1].trim();
   const userName = msg.from.first_name || 'Друг';
+  const username = msg.from.username || 'no_username';
   
   let welcomeMessage = '';
   let keyboard = {};
+  let source = 'direct';
   
   // ОБЩАЯ ЛИСТОВКА
   if (startParam === 'flyer_general') {
+    source = 'flyer_general';
     welcomeMessage = `Здравствуйте, ${userName}! 👋
 
 Вы узнали о нас из листовки? Отлично! 
@@ -61,6 +97,7 @@ bot.onText(/\/start(.*)/, async (msg, match) => {
   
   // СЕМЕЙНАЯ ЛИСТОВКА
   else if (startParam === 'flyer_family') {
+    source = 'flyer_family';
     welcomeMessage = `Здравствуйте, ${userName}! 👋
 
 Рады, что заинтересовались семейным паделом! 👨‍👩‍👧
@@ -86,6 +123,7 @@ bot.onText(/\/start(.*)/, async (msg, match) => {
   
   // ОБЫЧНЫЙ ЗАХОД
   else {
+    source = 'direct';
     welcomeMessage = `Привет, ${userName}! 👋
 
 Я бот клуба *Падел 10/20* 🎾
@@ -98,6 +136,9 @@ bot.onText(/\/start(.*)/, async (msg, match) => {
     keyboard = mainMenu;
   }
   
+  // Логируем в Supabase
+  await logToSupabase(source, userName, username, chatId, 'start', null);
+  
   await bot.sendMessage(chatId, welcomeMessage, {
     reply_markup: keyboard,
     parse_mode: 'Markdown'
@@ -109,6 +150,10 @@ bot.on('callback_query', async (query) => {
   const chatId = query.message.chat.id;
   const data = query.data;
   const userName = query.from.first_name || 'Друг';
+  const username = query.from.username || 'no_username';
+  
+  // Логируем действие
+  await logToSupabase('callback', userName, username, chatId, data, null);
   
   // Главное меню
   if (data === 'main_menu') {
@@ -147,7 +192,7 @@ bot.on('callback_query', async (query) => {
       }
     );
     
-    await bot.sendMessage(ADMIN_CHAT_ID, `📞 Пользователь ${userName} (@${query.from.username || 'нет username'}) открыл контакты`);
+    await bot.sendMessage(ADMIN_CHAT_ID, `📞 Пользователь ${userName} (@${username}) открыл контакты`);
   }
   
   // Пробное занятие (общее)
@@ -265,8 +310,11 @@ bot.on('text', async (msg) => {
   
   const chatId = msg.chat.id;
   const userName = msg.from.first_name || 'Пользователь';
-  const username = msg.from.username ? `@${msg.from.username}` : 'нет username';
+  const username = msg.from.username || 'no_username';
   const userMessage = msg.text;
+  
+  // Логируем сообщение
+  await logToSupabase('message', userName, username, chatId, 'text_message', userMessage);
   
   // Отвечаем пользователю
   await bot.sendMessage(chatId, 
@@ -286,12 +334,12 @@ bot.on('text', async (msg) => {
     }
   );
   
-  // Уведомляем админа БЕЗ MARKDOWN
+  // Уведомляем админа
   await bot.sendMessage(ADMIN_CHAT_ID, 
     `📩 Новое сообщение от клиента\n\n` +
-    `Имя: ${userName} (${username})\n` +
+    `Имя: ${userName} (@${username})\n` +
     `Сообщение:\n${userMessage}`
   );
 });
 
-console.log('🎾 Бот Падел 10/20 запущен!');
+console.log('🎾 Бот Падел 10/20 запущен с Supabase!');
